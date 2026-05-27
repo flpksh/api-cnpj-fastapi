@@ -20,17 +20,83 @@ router = APIRouter(
 )
 
 
-# LISTAR EMPRESAS
+# LISTAR EMPRESAS COM PAGINAÇÃO, FILTROS E ORDENAÇÃO
+
 @router.get("/")
 def listar_empresas(
+
+    page: int = 1,
+    limit: int = 10,
+
+    cidade: str | None = None,
+    estado: str | None = None,
+
+    ordem: str = "id",
+    direcao: str = "asc",
+
     db: Session = Depends(get_db),
     usuario: Usuario = Depends(obter_usuario_atual)
 ):
 
-    empresas = db.query(
+    skip = (page - 1) * limit
+
+    query = db.query(
         Empresa
     ).filter(
         Empresa.usuario_id == usuario.id
+    )
+
+    # FILTROS
+
+    if cidade:
+
+        query = query.filter(
+            Empresa.cidade.ilike(
+                f"%{cidade}%"
+            )
+        )
+
+    if estado:
+
+        query = query.filter(
+            Empresa.estado.ilike(
+                f"%{estado}%"
+            )
+        )
+
+    # ORDENAÇÃO
+
+    campos_validos = {
+        "id": Empresa.id,
+        "nome": Empresa.nome,
+        "cnpj": Empresa.cnpj,
+        "cidade": Empresa.cidade,
+        "estado": Empresa.estado
+    }
+
+    campo = campos_validos.get(
+        ordem,
+        Empresa.id
+    )
+
+    if direcao.lower() == "desc":
+
+        query = query.order_by(
+            campo.desc()
+        )
+
+    else:
+
+        query = query.order_by(
+            campo.asc()
+        )
+
+    total = query.count()
+
+    empresas = query.offset(
+        skip
+    ).limit(
+        limit
     ).all()
 
     return {
@@ -39,9 +105,24 @@ def listar_empresas(
 
         "message": "Empresas encontradas",
 
+        "pagination": {
+            "page": page,
+            "limit": limit,
+            "total": total
+        },
+
+        "filters": {
+            "cidade": cidade,
+            "estado": estado
+        },
+
+        "sorting": {
+            "ordem": ordem,
+            "direcao": direcao
+        },
+
         "data": empresas
     }
-
 
 # CRIAR EMPRESA
 @router.post("/")
