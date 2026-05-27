@@ -1,0 +1,24 @@
+# Ambiente virtual
+venv/
+
+# Variáveis sensíveis
+.env
+
+# Cache Python
+__pycache__/
+*.pyc
+
+# VS Code
+.vscode/
+
+# Logs
+*.log
+
+# Banco local
+*.db
+
+# Alembic cache
+migrations/__pycache__/
+
+# Sistema
+.DS_Store
