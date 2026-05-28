@@ -2,6 +2,7 @@ from sqlalchemy import Column
 from sqlalchemy import Integer
 from sqlalchemy import String
 from sqlalchemy import ForeignKey
+from sqlalchemy import Boolean
 
 from sqlalchemy.orm import relationship
 
@@ -33,9 +34,14 @@ class Empresa(Base):
 
     estado = Column(String)
 
+    ativo = Column(
+    	Boolean,
+    	default=True
+    )
+
     usuario_id = Column(
         Integer,
-        ForeignKey("usuarios.id")
+	ForeignKey("usuarios.id")
     )
 
     usuario = relationship(

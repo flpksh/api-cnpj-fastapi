@@ -41,10 +41,11 @@ def listar_empresas(
     skip = (page - 1) * limit
 
     query = db.query(
-        Empresa
+    	Empresa
     ).filter(
-        Empresa.usuario_id == usuario.id
-    )
+    	Empresa.usuario_id == usuario.id,
+    	Empresa.ativo == True
+)
 
     # FILTROS
 
@@ -210,7 +211,8 @@ def deletar_empresa(
         Empresa
     ).filter(
         Empresa.cnpj == cnpj,
-        Empresa.usuario_id == usuario.id
+        Empresa.usuario_id == usuario.id,
+        Empresa.ativo == True
     ).first()
 
     if not empresa:
@@ -220,7 +222,7 @@ def deletar_empresa(
             detail="Empresa não encontrada"
         )
 
-    db.delete(empresa)
+    empresa.ativo = False
 
     db.commit()
 
