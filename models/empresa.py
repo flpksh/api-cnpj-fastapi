@@ -3,7 +3,8 @@ from sqlalchemy import Integer
 from sqlalchemy import String
 from sqlalchemy import ForeignKey
 from sqlalchemy import Boolean
-
+from sqlalchemy import DateTime
+from datetime import datetime
 from sqlalchemy.orm import relationship
 
 from database import Base
@@ -37,6 +38,17 @@ class Empresa(Base):
     ativo = Column(
     	Boolean,
     	default=True
+    )
+
+    criado_em = Column(
+        DateTime,
+        default=datetime.utcnow
+    )
+
+    atualizado_em = Column(
+        DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow
     )
 
     usuario_id = Column(

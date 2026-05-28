@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
-
+from datetime import datetime
 from sqlalchemy.orm import Session
 
 from database import get_db
@@ -184,6 +184,8 @@ def atualizar_empresa(
     empresa.nome = dados.nome
     empresa.cidade = dados.cidade
     empresa.estado = dados.estado
+
+    empresa.atualizado_em = datetime.utcnow()
 
     db.commit()
 
