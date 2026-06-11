@@ -8,20 +8,12 @@ def listar_empresas(db: Session):
     return db.query(Empresa).all()
 
 
-def buscar_empresa_por_cnpj(
-    cnpj: str,
-    db: Session
-):
+def buscar_empresa_por_cnpj(cnpj: str, db: Session):
 
-    return db.query(Empresa).filter(
-        Empresa.cnpj == cnpj
-    ).first()
+    return db.query(Empresa).filter(Empresa.cnpj == cnpj).first()
 
 
-def criar_empresa(
-    nova_empresa: Empresa,
-    db: Session
-):
+def criar_empresa(nova_empresa: Empresa, db: Session):
 
     db.add(nova_empresa)
 
@@ -32,17 +24,12 @@ def criar_empresa(
     return nova_empresa
 
 
-def atualizar_empresa(
-    db: Session
-):
+def atualizar_empresa(db: Session):
 
     db.commit()
 
 
-def deletar_empresa(
-    empresa: Empresa,
-    db: Session
-):
+def deletar_empresa(empresa: Empresa, db: Session):
 
     db.delete(empresa)
 

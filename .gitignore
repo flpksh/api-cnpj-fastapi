@@ -1,15 +1,15 @@
-# Ambiente virtual
-venv/
-
 # Variáveis sensíveis
 .env
 
-# Cache Python
+# Ambiente virtual
+venv/
+.venv/
+
+# Python
 __pycache__/
 *.pyc
-
-# VS Code
-.vscode/
+*.pyo
+*.pyd
 
 # Logs
 *.log
@@ -17,8 +17,28 @@ __pycache__/
 # Banco local
 *.db
 
-# Alembic cache
-migrations/__pycache__/
+# IDEs
+.vscode/
+.idea/
 
-# Sistema
+# Sistema operacional
 .DS_Store
+Thumbs.db
+
+# Pytest
+.pytest_cache/
+
+# Coverage
+.coverage
+htmlcov/
+
+# Ruff
+.ruff_cache/
+
+# MyPy
+.mypy_cache/
+
+# Build
+dist/
+build/
+*.egg-info/

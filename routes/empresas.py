@@ -1,69 +1,46 @@
-from fastapi import APIRouter
-from fastapi import Depends
-from fastapi import HTTPException
 from datetime import datetime
+
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from database import get_db
-
 from core.security import obter_usuario_atual
-
-from models import Usuario
-from models import Empresa
-
+from database import get_db
+from models import Empresa, Usuario
 from schemas.empresa_schema import EmpresaCreate
 
-
-router = APIRouter(
-    prefix="/empresas",
-    tags=["Empresas"]
-)
+router = APIRouter(prefix="/empresas", tags=["Empresas"])
 
 
 # LISTAR EMPRESAS COM PAGINAÇÃO, FILTROS E ORDENAÇÃO
 
+
 @router.get("/")
 def listar_empresas(
-
     page: int = 1,
     limit: int = 10,
-
     cidade: str | None = None,
     estado: str | None = None,
-
     ordem: str = "id",
     direcao: str = "asc",
-
     db: Session = Depends(get_db),
-    usuario: Usuario = Depends(obter_usuario_atual)
+    usuario: Usuario = Depends(obter_usuario_atual),
 ):
 
     skip = (page - 1) * limit
 
-    query = db.query(
-    	Empresa
-    ).filter(
-    	Empresa.usuario_id == usuario.id,
-    	Empresa.ativo == True
-)
+    query = db.query(Empresa).filter(
+        Empresa.usuario_id == usuario.id, Empresa.ativo
+    )
 
     # FILTROS
 
     if cidade:
 
-        query = query.filter(
-            Empresa.cidade.ilike(
-                f"%{cidade}%"
-            )
-        )
+        query = query.filter(Empresa.cidade.ilike(f"%{cidade}%"))
 
     if estado:
 
-        query = query.filter(
-            Empresa.estado.ilike(
-                f"%{estado}%"
-            )
-        )
+        query = query.filter(Empresa.estado.ilike(f"%{estado}%"))
 
     # ORDENAÇÃO
 
@@ -72,74 +49,47 @@ def listar_empresas(
         "nome": Empresa.nome,
         "cnpj": Empresa.cnpj,
         "cidade": Empresa.cidade,
-        "estado": Empresa.estado
+        "estado": Empresa.estado,
     }
 
-    campo = campos_validos.get(
-        ordem,
-        Empresa.id
-    )
+    campo = campos_validos.get(ordem, Empresa.id)
 
     if direcao.lower() == "desc":
 
-        query = query.order_by(
-            campo.desc()
-        )
+        query = query.order_by(campo.desc())
 
     else:
 
-        query = query.order_by(
-            campo.asc()
-        )
+        query = query.order_by(campo.asc())
 
     total = query.count()
 
-    empresas = query.offset(
-        skip
-    ).limit(
-        limit
-    ).all()
+    empresas = query.offset(skip).limit(limit).all()
 
     return {
-
         "success": True,
-
         "message": "Empresas encontradas",
-
-        "pagination": {
-            "page": page,
-            "limit": limit,
-            "total": total
-        },
-
-        "filters": {
-            "cidade": cidade,
-            "estado": estado
-        },
-
-        "sorting": {
-            "ordem": ordem,
-            "direcao": direcao
-        },
-
-        "data": empresas
+        "pagination": {"page": page, "limit": limit, "total": total},
+        "filters": {"cidade": cidade, "estado": estado},
+        "sorting": {"ordem": ordem, "direcao": direcao},
+        "data": empresas,
     }
+
 
 # CRIAR EMPRESA
 @router.post("/")
 def criar_empresa(
     empresa: EmpresaCreate,
     db: Session = Depends(get_db),
-    usuario: Usuario = Depends(obter_usuario_atual)
+    usuario: Usuario = Depends(obter_usuario_atual),
 ):
 
     nova_empresa = Empresa(
-
         cnpj=empresa.cnpj,
         nome=empresa.nome,
         cidade=empresa.cidade,
         estado=empresa.estado,
-        usuario_id=usuario.id
+        usuario_id=usuario.id,
     )
 
     db.add(nova_empresa)
@@ -149,12 +99,9 @@ def criar_empresa(
     db.refresh(nova_empresa)
 
     return {
-
         "success": True,
-
         "message": "Empresa criada com sucesso",
-
-        "data": nova_empresa
+        "data": nova_empresa,
     }
 
 
@@ -164,22 +111,18 @@ def atualizar_empresa(
     cnpj: str,
     dados: EmpresaCreate,
     db: Session = Depends(get_db),
-    usuario: Usuario = Depends(obter_usuario_atual)
+    usuario: Usuario = Depends(obter_usuario_atual),
 ):
 
-    empresa = db.query(
-        Empresa
-    ).filter(
-        Empresa.cnpj == cnpj,
-        Empresa.usuario_id == usuario.id
-    ).first()
+    empresa = (
+        db.query(Empresa)
+        .filter(Empresa.cnpj == cnpj, Empresa.usuario_id == usuario.id)
+        .first()
+    )
 
     if not empresa:
 
-        raise HTTPException(
-            status_code=404,
-            detail="Empresa não encontrada"
-        )
+        raise HTTPException(status_code=404, detail="Empresa não encontrada")
 
     empresa.nome = dados.nome
     empresa.cidade = dados.cidade
@@ -191,14 +134,7 @@ def atualizar_empresa(
 
     db.refresh(empresa)
 
-    return {
-
-        "success": True,
-
-        "message": "Empresa atualizada",
-
-        "data": empresa
-    }
+    return {"success": True, "message": "Empresa atualizada", "data": empresa}
 
 
 # DELETAR EMPRESA
@@ -206,33 +142,25 @@ def atualizar_empresa(
 def deletar_empresa(
     cnpj: str,
     db: Session = Depends(get_db),
-    usuario: Usuario = Depends(obter_usuario_atual)
+    usuario: Usuario = Depends(obter_usuario_atual),
 ):
 
-    empresa = db.query(
-        Empresa
-    ).filter(
-        Empresa.cnpj == cnpj,
-        Empresa.usuario_id == usuario.id,
-        Empresa.ativo == True
-    ).first()
+    empresa = (
+        db.query(Empresa)
+        .filter(
+            Empresa.cnpj == cnpj,
+            Empresa.usuario_id == usuario.id,
+            Empresa.ativo,
+        )
+        .first()
+    )
 
     if not empresa:
 
-        raise HTTPException(
-            status_code=404,
-            detail="Empresa não encontrada"
-        )
+        raise HTTPException(status_code=404, detail="Empresa não encontrada")
 
     empresa.ativo = False
 
     db.commit()
 
-    return {
-
-        "success": True,
-
-        "message": "Empresa removida",
-
-        "data": None
-    }
+    return {"success": True, "message": "Empresa removida", "data": None}
