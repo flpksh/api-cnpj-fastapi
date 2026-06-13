@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 
 from core.config import settings
 from database import get_db
-from models import Usuario
+from models.usuario import Usuario
 
 # ==========================================
 # HASH DE SENHA

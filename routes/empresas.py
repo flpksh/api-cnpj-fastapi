@@ -5,7 +5,8 @@ from sqlalchemy.orm import Session
 
 from core.security import obter_usuario_atual
 from database import get_db
-from models import Empresa, Usuario
+from models.usuario import Usuario
+from models.empresa import Empresa
 from schemas.empresa_schema import EmpresaCreate
 
 router = APIRouter(prefix="/empresas", tags=["Empresas"])
