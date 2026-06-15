@@ -2,6 +2,7 @@ from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 
 from core.security import obter_usuario_atual
 from database import get_db
@@ -95,16 +96,23 @@ def criar_empresa(
 
     db.add(nova_empresa)
 
-    db.commit()
+    try:
+        db.commit()
+        db.refresh(nova_empresa)
 
-    db.refresh(nova_empresa)
+    except IntegrityError:
+        db.rollback()
+
+        raise HTTPException(
+            status_code=409,
+            detail="CNPJ já cadastrado",
+        )
 
     return {
         "success": True,
         "message": "Empresa criada com sucesso",
         "data": nova_empresa,
     }
-
 
 # ATUALIZAR EMPRESA
 @router.put("/{cnpj}")
