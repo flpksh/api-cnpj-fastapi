@@ -143,3 +143,56 @@ def test_protected_route_invalid_token(client):
     assert response.json() == {
         "detail": "Token inválido"
     }
+
+def test_create_empresa_success(client):
+    username = f"user_{uuid4().hex}"
+
+    # Registro
+    client.post(
+        "/auth/register",
+        json={
+            "username": username,
+            "senha": "123456"
+        }
+    )
+
+    # Login
+    login = client.post(
+        "/auth/login",
+        data={
+            "username": username,
+            "password": "123456"
+        }
+    )
+
+    token = login.json()["access_token"]
+
+    # Criação da empresa
+    response = client.post(
+        "/empresas/",
+        headers={
+            "Authorization": f"Bearer {token}"
+        },
+        json={
+            "cnpj": "12345678000195",
+            "nome": "Empresa Teste",
+            "cidade": "Florianópolis",
+            "estado": "SC"
+        }
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert data["success"] is True
+    assert data["message"] == "Empresa criada com sucesso"
+
+    empresa = data["data"]
+
+    assert empresa["cnpj"] == "12345678000195"
+    assert empresa["nome"] == "Empresa Teste"
+    assert empresa["cidade"] == "Florianópolis"
+    assert empresa["estado"] == "SC"
+
+    assert "id" in empresa

@@ -117,7 +117,11 @@ def atualizar_empresa(
 
     empresa = (
         db.query(Empresa)
-        .filter(Empresa.cnpj == cnpj, Empresa.usuario_id == usuario.id)
+        .filter(
+             Empresa.cnpj == cnpj,
+             Empresa.usuario_id == usuario.id,
+             Empresa.ativo,
+         )
         .first()
     )
 
