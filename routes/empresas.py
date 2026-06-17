@@ -1,13 +1,13 @@
 from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import Session
 
 from core.security import obter_usuario_atual
 from database import get_db
-from models.usuario import Usuario
 from models.empresa import Empresa
+from models.usuario import Usuario
 from schemas.empresa_schema import EmpresaCreate
 
 router = APIRouter(prefix="/empresas", tags=["Empresas"])

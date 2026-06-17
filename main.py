@@ -1,12 +1,8 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
-from core.exceptions import (
-    CredenciaisInvalidas,
-    EmpresaNaoEncontrada,
-    UsuarioJaExiste,
-    UsuarioNaoEncontrado,
-)
+from core.exceptions import (CredenciaisInvalidas, EmpresaNaoEncontrada,
+                             UsuarioJaExiste, UsuarioNaoEncontrado)
 from routes.auth import router as auth_router
 from routes.empresas import router as empresas_router
 
