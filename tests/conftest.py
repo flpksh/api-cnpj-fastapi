@@ -9,7 +9,6 @@ from main import app
 from database import get_db
 from database import Base
 
-
 SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
 
 engine = create_engine(
@@ -35,7 +34,6 @@ def db():
     finally:
         db.close()
         Base.metadata.drop_all(bind=engine)
-
 
 
 @pytest.fixture

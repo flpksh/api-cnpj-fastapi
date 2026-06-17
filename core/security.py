@@ -59,9 +59,9 @@ def criar_token(dados: dict, tempo_expiracao: timedelta | None = None):
 
     else:
 
-         expire = datetime.now(timezone.utc) + timedelta(
+        expire = datetime.now(timezone.utc) + timedelta(
             minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
-         )
+        )
 
     dados_token.update({"exp": expire})
 
@@ -98,7 +98,7 @@ def verificar_token(token: str = Depends(oauth2_scheme)):
         return username
 
     except JWTError as e:
-        
+
         raise credenciais_exception from e
 
 

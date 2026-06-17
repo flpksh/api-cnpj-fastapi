@@ -30,9 +30,7 @@ def listar_empresas(
 
     skip = (page - 1) * limit
 
-    query = db.query(Empresa).filter(
-        Empresa.usuario_id == usuario.id, Empresa.ativo
-    )
+    query = db.query(Empresa).filter(Empresa.usuario_id == usuario.id, Empresa.ativo)
 
     # FILTROS
 
@@ -114,6 +112,7 @@ def criar_empresa(
         "data": nova_empresa,
     }
 
+
 # ATUALIZAR EMPRESA
 @router.put("/{cnpj}")
 def atualizar_empresa(
@@ -126,10 +125,10 @@ def atualizar_empresa(
     empresa = (
         db.query(Empresa)
         .filter(
-             Empresa.cnpj == cnpj,
-             Empresa.usuario_id == usuario.id,
-             Empresa.ativo,
-         )
+            Empresa.cnpj == cnpj,
+            Empresa.usuario_id == usuario.id,
+            Empresa.ativo,
+        )
         .first()
     )
 

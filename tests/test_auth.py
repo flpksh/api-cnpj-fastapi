@@ -1,34 +1,22 @@
 from uuid import uuid4
 
+
 def test_register(client):
     username = f"user_test_{uuid4().hex}"
 
     response = client.post(
-        "/auth/register",
-        json={
-            "username": username,
-            "senha": "123456"
-        }
+        "/auth/register", json={"username": username, "senha": "123456"}
     )
 
     assert response.status_code == 200
     assert "id" in response.json()["data"]
 
+
 def test_login(client):
-    client.post(
-        "/auth/register",
-        json={
-            "username": "user_login",
-            "senha": "123456"
-        }
-    )
+    client.post("/auth/register", json={"username": "user_login", "senha": "123456"})
 
     response = client.post(
-        "/auth/login",
-        data={
-            "username": "user_login",
-            "password": "123456"
-        }
+        "/auth/login", data={"username": "user_login", "password": "123456"}
     )
 
     assert response.status_code == 200
@@ -37,31 +25,17 @@ def test_login(client):
     assert "access_token" in data
     assert data["token_type"] == "bearer"
 
+
 def test_protected_route(client):
-    client.post(
-        "/auth/register",
-        json={
-            "username": "user_token",
-            "senha": "123456"
-        }
-    )
+    client.post("/auth/register", json={"username": "user_token", "senha": "123456"})
 
     login = client.post(
-        "/auth/login",
-        data={
-            "username": "user_token",
-            "password": "123456"
-        }
+        "/auth/login", data={"username": "user_token", "password": "123456"}
     )
 
     token = login.json()["access_token"]
 
-    response = client.get(
-        "/empresas/",
-        headers={
-            "Authorization": f"Bearer {token}"
-        }
-    )
+    response = client.get("/empresas/", headers={"Authorization": f"Bearer {token}"})
 
     assert response.status_code == 200
 
@@ -70,21 +44,13 @@ def test_register_duplicate_user(client):
     username = f"user_{uuid4().hex}"
 
     response_1 = client.post(
-        "/auth/register",
-        json={
-            "username": username,
-            "senha": "123456"
-        }
+        "/auth/register", json={"username": username, "senha": "123456"}
     )
 
     assert response_1.status_code == 200
 
     response_2 = client.post(
-        "/auth/register",
-        json={
-            "username": username,
-            "senha": "123456"
-        }
+        "/auth/register", json={"username": username, "senha": "123456"}
     )
 
     assert response_2.status_code == 409
@@ -93,20 +59,10 @@ def test_register_duplicate_user(client):
 def test_login_invalid_password(client):
     username = f"user_{uuid4().hex}"
 
-    client.post(
-        "/auth/register",
-        json={
-            "username": username,
-            "senha": "123456"
-        }
-    )
+    client.post("/auth/register", json={"username": username, "senha": "123456"})
 
     response = client.post(
-        "/auth/login",
-        data={
-            "username": username,
-            "password": "senha_errada"
-        }
+        "/auth/login", data={"username": username, "password": "senha_errada"}
     )
 
     assert response.status_code == 401
@@ -114,55 +70,37 @@ def test_login_invalid_password(client):
 
 def test_login_nonexistent_user(client):
     response = client.post(
-        "/auth/login",
-        data={
-            "username": f"user_{uuid4().hex}",
-            "password": "123456"
-        }
+        "/auth/login", data={"username": f"user_{uuid4().hex}", "password": "123456"}
     )
 
     assert response.status_code == 401
+
 
 def test_protected_route_without_token(client):
     response = client.get("/empresas/")
 
     assert response.status_code == 401
-    assert response.json() == {
-        "detail": "Not authenticated"
-    }
+    assert response.json() == {"detail": "Not authenticated"}
+
 
 def test_protected_route_invalid_token(client):
     response = client.get(
-        "/empresas/",
-        headers={
-            "Authorization": "Bearer token_invalido"
-        }
+        "/empresas/", headers={"Authorization": "Bearer token_invalido"}
     )
 
     assert response.status_code == 401
-    assert response.json() == {
-        "detail": "Token inválido"
-    }
+    assert response.json() == {"detail": "Token inválido"}
+
 
 def test_create_empresa_success(client):
     username = f"user_{uuid4().hex}"
 
     # Registro
-    client.post(
-        "/auth/register",
-        json={
-            "username": username,
-            "senha": "123456"
-        }
-    )
+    client.post("/auth/register", json={"username": username, "senha": "123456"})
 
     # Login
     login = client.post(
-        "/auth/login",
-        data={
-            "username": username,
-            "password": "123456"
-        }
+        "/auth/login", data={"username": username, "password": "123456"}
     )
 
     token = login.json()["access_token"]
@@ -170,15 +108,13 @@ def test_create_empresa_success(client):
     # Criação da empresa
     response = client.post(
         "/empresas/",
-        headers={
-            "Authorization": f"Bearer {token}"
-        },
+        headers={"Authorization": f"Bearer {token}"},
         json={
             "cnpj": "12345678000195",
             "nome": "Empresa Teste",
             "cidade": "Florianópolis",
-            "estado": "SC"
-        }
+            "estado": "SC",
+        },
     )
 
     assert response.status_code == 200
@@ -197,25 +133,16 @@ def test_create_empresa_success(client):
 
     assert "id" in empresa
 
+
 def test_create_empresa_invalid_cnpj(client):
     username = f"user_{uuid4().hex}"
 
     # Registro
-    client.post(
-        "/auth/register",
-        json={
-            "username": username,
-            "senha": "123456"
-        }
-    )
+    client.post("/auth/register", json={"username": username, "senha": "123456"})
 
     # Login
     login = client.post(
-        "/auth/login",
-        data={
-            "username": username,
-            "password": "123456"
-        }
+        "/auth/login", data={"username": username, "password": "123456"}
     )
 
     token = login.json()["access_token"]
@@ -223,15 +150,13 @@ def test_create_empresa_invalid_cnpj(client):
     # Tentativa de criar empresa com CNPJ inválido
     response = client.post(
         "/empresas/",
-        headers={
-            "Authorization": f"Bearer {token}"
-        },
+        headers={"Authorization": f"Bearer {token}"},
         json={
             "cnpj": "123",
             "nome": "Empresa Inválida",
             "cidade": "Florianópolis",
-            "estado": "SC"
-        }
+            "estado": "SC",
+        },
     )
 
     assert response.status_code == 422
@@ -240,23 +165,14 @@ def test_create_empresa_invalid_cnpj(client):
 
     assert "detail" in body
 
+
 def test_create_empresa_duplicate_cnpj(client):
     username = f"user_{uuid4().hex}"
 
-    client.post(
-        "/auth/register",
-        json={
-            "username": username,
-            "senha": "123456"
-        }
-    )
+    client.post("/auth/register", json={"username": username, "senha": "123456"})
 
     login = client.post(
-        "/auth/login",
-        data={
-            "username": username,
-            "password": "123456"
-        }
+        "/auth/login", data={"username": username, "password": "123456"}
     )
 
     token = login.json()["access_token"]
@@ -270,9 +186,7 @@ def test_create_empresa_duplicate_cnpj(client):
 
     primeira = client.post(
         "/empresas/",
-        headers={
-            "Authorization": f"Bearer {token}"
-        },
+        headers={"Authorization": f"Bearer {token}"},
         json=payload,
     )
 
@@ -280,9 +194,7 @@ def test_create_empresa_duplicate_cnpj(client):
 
     segunda = client.post(
         "/empresas/",
-        headers={
-            "Authorization": f"Bearer {token}"
-        },
+        headers={"Authorization": f"Bearer {token}"},
         json=payload,
     )
 
@@ -292,33 +204,19 @@ def test_create_empresa_duplicate_cnpj(client):
 
     assert body["detail"] == "CNPJ já cadastrado"
 
+
 def test_list_empresas_empty(client):
     username = f"user_{uuid4().hex}"
 
-    client.post(
-        "/auth/register",
-        json={
-            "username": username,
-            "senha": "123456"
-        }
-    )
+    client.post("/auth/register", json={"username": username, "senha": "123456"})
 
     login = client.post(
-        "/auth/login",
-        data={
-            "username": username,
-            "password": "123456"
-        }
+        "/auth/login", data={"username": username, "password": "123456"}
     )
 
     token = login.json()["access_token"]
 
-    response = client.get(
-        "/empresas/",
-        headers={
-            "Authorization": f"Bearer {token}"
-        }
-    )
+    response = client.get("/empresas/", headers={"Authorization": f"Bearer {token}"})
 
     assert response.status_code == 200
 
@@ -328,24 +226,15 @@ def test_list_empresas_empty(client):
     assert body["data"] == []
     assert body["pagination"]["total"] == 0
 
+
 def test_list_empresas_only_owner(client):
     # Usuário A
     username_a = f"user_a_{uuid4().hex}"
 
-    client.post(
-        "/auth/register",
-        json={
-            "username": username_a,
-            "senha": "123456"
-        }
-    )
+    client.post("/auth/register", json={"username": username_a, "senha": "123456"})
 
     login_a = client.post(
-        "/auth/login",
-        data={
-            "username": username_a,
-            "password": "123456"
-        }
+        "/auth/login", data={"username": username_a, "password": "123456"}
     )
 
     token_a = login_a.json()["access_token"]
@@ -353,34 +242,22 @@ def test_list_empresas_only_owner(client):
     # Empresa do usuário A
     client.post(
         "/empresas/",
-        headers={
-            "Authorization": f"Bearer {token_a}"
-        },
+        headers={"Authorization": f"Bearer {token_a}"},
         json={
             "cnpj": "11111111000111",
             "nome": "Empresa A",
             "cidade": "Florianópolis",
-            "estado": "SC"
-        }
+            "estado": "SC",
+        },
     )
 
     # Usuário B
     username_b = f"user_b_{uuid4().hex}"
 
-    client.post(
-        "/auth/register",
-        json={
-            "username": username_b,
-            "senha": "123456"
-        }
-    )
+    client.post("/auth/register", json={"username": username_b, "senha": "123456"})
 
     login_b = client.post(
-        "/auth/login",
-        data={
-            "username": username_b,
-            "password": "123456"
-        }
+        "/auth/login", data={"username": username_b, "password": "123456"}
     )
 
     token_b = login_b.json()["access_token"]
@@ -388,24 +265,17 @@ def test_list_empresas_only_owner(client):
     # Empresa do usuário B
     client.post(
         "/empresas/",
-        headers={
-            "Authorization": f"Bearer {token_b}"
-        },
+        headers={"Authorization": f"Bearer {token_b}"},
         json={
             "cnpj": "22222222000122",
             "nome": "Empresa B",
             "cidade": "São Paulo",
-            "estado": "SP"
-        }
+            "estado": "SP",
+        },
     )
 
     # Usuário A lista empresas
-    response = client.get(
-        "/empresas/",
-        headers={
-            "Authorization": f"Bearer {token_a}"
-        }
-    )
+    response = client.get("/empresas/", headers={"Authorization": f"Bearer {token_a}"})
 
     assert response.status_code == 200
 
@@ -417,51 +287,38 @@ def test_list_empresas_only_owner(client):
     assert empresas[0]["nome"] == "Empresa A"
     assert empresas[0]["cnpj"] == "11111111000111"
 
+
 def test_update_empresa_success(client):
     username = f"user_{uuid4().hex}"
 
-    client.post(
-        "/auth/register",
-        json={
-            "username": username,
-            "senha": "123456"
-        }
-    )
+    client.post("/auth/register", json={"username": username, "senha": "123456"})
 
     login = client.post(
-        "/auth/login",
-        data={
-            "username": username,
-            "password": "123456"
-        }
+        "/auth/login", data={"username": username, "password": "123456"}
     )
 
     token = login.json()["access_token"]
 
     client.post(
         "/empresas/",
-        headers={
-            "Authorization": f"Bearer {token}"
-        },
+        headers={"Authorization": f"Bearer {token}"},
         json={
             "cnpj": "33333333000133",
             "nome": "Empresa Original",
             "cidade": "Florianópolis",
-            "estado": "SC"
-        }
+            "estado": "SC",
+        },
     )
 
     response = client.put(
         "/empresas/33333333000133",
-        headers={
-            "Authorization": f"Bearer {token}"
-        },
+        headers={"Authorization": f"Bearer {token}"},
         json={
             "cnpj": "33333333000133",
             "nome": "Empresa Atualizada",
             "cidade": "Joinville",
-            "estado": "SC"
-        }
+            "estado": "SC",
+        },
     )
 
     assert response.status_code == 200
@@ -477,24 +334,15 @@ def test_update_empresa_success(client):
     assert empresa["cidade"] == "Joinville"
     assert empresa["estado"] == "SC"
 
+
 def test_update_empresa_other_user_forbidden(client):
     # Usuário A
     username_a = f"user_a_{uuid4().hex}"
 
-    client.post(
-        "/auth/register",
-        json={
-            "username": username_a,
-            "senha": "123456"
-        }
-    )
+    client.post("/auth/register", json={"username": username_a, "senha": "123456"})
 
     login_a = client.post(
-        "/auth/login",
-        data={
-            "username": username_a,
-            "password": "123456"
-        }
+        "/auth/login", data={"username": username_a, "password": "123456"}
     )
 
     token_a = login_a.json()["access_token"]
@@ -502,34 +350,22 @@ def test_update_empresa_other_user_forbidden(client):
     # Usuário A cria empresa
     client.post(
         "/empresas/",
-        headers={
-            "Authorization": f"Bearer {token_a}"
-        },
+        headers={"Authorization": f"Bearer {token_a}"},
         json={
             "cnpj": "44444444000144",
             "nome": "Empresa do Usuário A",
             "cidade": "Florianópolis",
-            "estado": "SC"
-        }
+            "estado": "SC",
+        },
     )
 
     # Usuário B
     username_b = f"user_b_{uuid4().hex}"
 
-    client.post(
-        "/auth/register",
-        json={
-            "username": username_b,
-            "senha": "123456"
-        }
-    )
+    client.post("/auth/register", json={"username": username_b, "senha": "123456"})
 
     login_b = client.post(
-        "/auth/login",
-        data={
-            "username": username_b,
-            "password": "123456"
-        }
+        "/auth/login", data={"username": username_b, "password": "123456"}
     )
 
     token_b = login_b.json()["access_token"]
@@ -537,15 +373,13 @@ def test_update_empresa_other_user_forbidden(client):
     # Usuário B tenta atualizar empresa do A
     response = client.put(
         "/empresas/44444444000144",
-        headers={
-            "Authorization": f"Bearer {token_b}"
-        },
+        headers={"Authorization": f"Bearer {token_b}"},
         json={
             "cnpj": "44444444000144",
             "nome": "Tentativa de Invasão",
             "cidade": "São Paulo",
-            "estado": "SP"
-        }
+            "estado": "SP",
+        },
     )
 
     assert response.status_code == 404
@@ -579,9 +413,7 @@ def test_delete_empresa_success(client):
     # cria empresa
     client.post(
         "/empresas/",
-        headers={
-            "Authorization": f"Bearer {token}"
-        },
+        headers={"Authorization": f"Bearer {token}"},
         json={
             "cnpj": "55555555000155",
             "nome": "Empresa Delete",
@@ -593,9 +425,7 @@ def test_delete_empresa_success(client):
     # remove empresa
     response = client.delete(
         "/empresas/55555555000155",
-        headers={
-            "Authorization": f"Bearer {token}"
-        },
+        headers={"Authorization": f"Bearer {token}"},
     )
 
     assert response.status_code == 200
@@ -628,9 +458,7 @@ def test_soft_delete_removes_empresa_from_listing(client):
 
     token = login.json()["access_token"]
 
-    headers = {
-        "Authorization": f"Bearer {token}"
-    }
+    headers = {"Authorization": f"Bearer {token}"}
 
     payload = {
         "cnpj": "66666666000166",
@@ -700,9 +528,7 @@ def test_delete_empresa_twice(client):
 
     token = login.json()["access_token"]
 
-    headers = {
-        "Authorization": f"Bearer {token}"
-    }
+    headers = {"Authorization": f"Bearer {token}"}
 
     client.post(
         "/empresas/",
@@ -759,9 +585,7 @@ def test_delete_empresa_other_user_forbidden(client):
     # Empresa do usuário A
     client.post(
         "/empresas/",
-        headers={
-            "Authorization": f"Bearer {token_a}"
-        },
+        headers={"Authorization": f"Bearer {token_a}"},
         json={
             "cnpj": "88888888000188",
             "nome": "Empresa do Usuário A",
@@ -794,9 +618,7 @@ def test_delete_empresa_other_user_forbidden(client):
     # Usuário B tenta excluir empresa do A
     response = client.delete(
         "/empresas/88888888000188",
-        headers={
-            "Authorization": f"Bearer {token_b}"
-        },
+        headers={"Authorization": f"Bearer {token_b}"},
     )
 
     assert response.status_code == 404
@@ -829,9 +651,7 @@ def test_update_empresa_not_found(client):
 
     response = client.put(
         "/empresas/99999999000199",
-        headers={
-            "Authorization": f"Bearer {token}"
-        },
+        headers={"Authorization": f"Bearer {token}"},
         json={
             "cnpj": "99999999000199",
             "nome": "Empresa Inexistente",
