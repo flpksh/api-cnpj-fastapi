@@ -1,115 +1,189 @@
-# API de Consulta de Empresas (CNPJ)
+# API CNPJ (Ainda em desenvolvimento)
 
-Projeto desenvolvido com foco em aprendizado prático de backend utilizando FastAPI, PostgreSQL e Docker.
+API REST desenvolvida com **FastAPI** para gerenciamento de usuários e empresas, aplicando boas práticas de desenvolvimento backend, arquitetura em camadas e documentação automática de APIs.
 
-##  Tecnologias utilizadas
+O projeto foi desenvolvido utilizando uma arquitetura organizada em **Routes → Services → Repositories → Models**, com autenticação JWT, banco de dados relacional, migrações versionadas e conteinerização com Docker.
 
-- Python
-- FastAPI
-- PostgreSQL
-- Docker
-- Uvicorn
-
-## Funcionalidades
-
-- Criar empresa
-- Listar empresas
-- Buscar empresa por CNPJ
-- Atualizar empresa
-- Deletar empresa
-
-## Como executar o projeto
-
-### 1. Clonar o repositório
-```bash
-git clone <url-do-repositorio>
-
-#######################################################################################################################################
-
-# API CNPJ
-
-API REST desenvolvida com FastAPI para gerenciamento de empresas e usuários.
+---
 
 ## Tecnologias
 
-- Python
-- FastAPI
-- SQLAlchemy
-- PostgreSQL
-- Alembic
-- JWT Authentication
-- Docker
-- Docker Compose
+### Backend
+
+* Python 3.12
+* FastAPI
+* SQLAlchemy
+* Pydantic
+* Uvicorn
+
+### Banco de Dados
+
+* PostgreSQL
+* Alembic (Migrations)
+
+### Segurança
+
+* JWT Authentication
+* Hash de senhas
+
+### DevOps
+
+* Docker
+* Docker Compose
+
+### Testes
+
+* Pytest
 
 ---
 
 # Funcionalidades
 
-- Cadastro de usuários
-- Login com JWT
-- CRUD de empresas
-- Relacionamento usuário → empresas
-- Paginação
-- Filtros
-- Ordenação
-- Soft delete
-- Auditoria
-- Containerização com Docker
+## Autenticação
+
+* Cadastro de usuários
+* Login com JWT
+* Proteção de rotas autenticadas
+
+## Empresas
+
+* Cadastro de empresas
+* Listagem paginada
+* Consulta por CNPJ
+* Atualização de empresas
+* Soft Delete
+* Auditoria de registros
+
+## Recursos adicionais
+
+* Paginação
+* Filtros
+* Ordenação
+* Tratamento global de exceções
+* Respostas padronizadas
+* Documentação automática com Swagger/OpenAPI
 
 ---
 
-# Estrutura do Projeto
+# Arquitetura
 
-```bash
+```text
+Cliente
+    │
+    ▼
+FastAPI
+    │
+    ▼
+Routes
+    │
+    ▼
+Services
+    │
+    ▼
+Repositories
+    │
+    ▼
+PostgreSQL
+```
+
+### Organização do projeto
+
+```text
 api_cnpj/
 │
 ├── core/
-├── models/
-├── routes/
-├── schemas/
-├── services/
+│   ├── config.py
+│   ├── exceptions.py
+│   ├── logger.py
+│   ├── responses.py
+│   └── security.py
+│
+├── database/
+│
 ├── migrations/
-├── main.py
+│
+├── models/
+│
+├── repositories/
+│
+├── routes/
+│
+├── schemas/
+│
+├── services/
+│
+├── tests/
+│
 ├── Dockerfile
 ├── docker-compose.yml
-└── requirements.txt
+├── main.py
+└── README.md
 ```
 
 ---
 
-# Como executar localmente
+# Endpoints
 
-## Clonar repositório
+## Autenticação
+
+| Método | Endpoint       | Descrição              |
+| ------ | -------------- | ---------------------- |
+| POST   | /auth/register | Cadastro de usuário    |
+| POST   | /auth/login    | Login e geração do JWT |
+
+---
+
+## Empresas
+
+| Método | Endpoint         | Descrição                    |
+| ------ | ---------------- | ---------------------------- |
+| GET    | /empresas        | Lista empresas               |
+| GET    | /empresas/{cnpj} | Busca empresa por CNPJ       |
+| POST   | /empresas        | Cadastra empresa             |
+| PUT    | /empresas/{cnpj} | Atualiza empresa             |
+| DELETE | /empresas/{cnpj} | Remove empresa (Soft Delete) |
+
+---
+
+# Como executar
+
+## Clonar o projeto
 
 ```bash
-git clone https://github.com/flpksh
+git clone https://github.com/flpksh/api_cnpj.git
 ```
-
-## Entrar na pasta
 
 ```bash
 cd api_cnpj
 ```
 
-## Subir containers
+---
+
+## Executar com Docker
 
 ```bash
 docker compose up --build
 ```
 
+A aplicação ficará disponível em:
+
+```
+http://localhost:8000
+```
+
 ---
 
-# Acessar documentação
+# Documentação da API
 
-Swagger:
+Swagger
 
-```bash
+```
 http://localhost:8000/docs
 ```
 
-Redoc:
+ReDoc
 
-```bash
+```
 http://localhost:8000/redoc
 ```
 
@@ -117,45 +191,74 @@ http://localhost:8000/redoc
 
 # Autenticação
 
-A API utiliza JWT Bearer Token.
+A API utiliza autenticação baseada em **JWT Bearer Token**.
 
-## Fluxo
+Fluxo de autenticação:
 
-1. Registrar usuário
-2. Fazer login
-3. Copiar token
-4. Autorizar no Swagger
-
----
-
-# Endpoints principais
-
-## Auth
-
-- POST `/auth/register`
-- POST `/auth/login`
-
-## Empresas
-
-- GET `/empresas`
-- POST `/empresas`
-- PUT `/empresas/{cnpj}`
-- DELETE `/empresas/{cnpj}`
+1. Registrar um usuário
+2. Realizar login
+3. Receber o Access Token
+4. Informar o token no botão **Authorize** do Swagger
+5. Consumir os endpoints protegidos
 
 ---
 
-# Diferenciais implementados
+# Estrutura das respostas
 
-- Arquitetura organizada
-- Segurança JWT
-- Soft delete
-- Auditoria
-- Dockerização
-- PostgreSQL
-- Alembic migrations
+A API retorna respostas padronizadas.
+
+### Sucesso
+
+```json
+{
+  "success": true,
+  "message": "Operação realizada com sucesso.",
+  "data": {}
+}
+```
+
+### Erro
+
+```json
+{
+  "success": false,
+  "message": "Empresa não encontrada.",
+  "data": null
+}
+```
+
+---
+
+# Diferenciais do projeto
+
+* Arquitetura em camadas (Routes, Services e Repositories)
+* Repository Pattern
+* Separação entre regras de negócio e acesso a dados
+* Autenticação JWT
+* Tratamento global de exceções
+* Soft Delete
+* Auditoria de registros
+* Paginação, filtros e ordenação
+* Documentação automática com Swagger/OpenAPI
+* Migrações de banco com Alembic
+* Conteinerização com Docker
+* Testes automatizados com Pytest
+
+---
+
+# Próximas evoluções
+
+* Pipeline CI/CD
+* Deploy em ambiente cloud
+* Observabilidade com Prometheus e Grafana
+* Cache com Redis
+* Cobertura de testes ampliada
+* Integração contínua
 
 ---
 
 # Autor
 
-Luis Felipe
+**Luis Felipe**
+
+Desenvolvedor Backend focado em Python, FastAPI, APIs REST e arquitetura de software.
