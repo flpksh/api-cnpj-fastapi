@@ -5,6 +5,8 @@ from core.logger import logger
 from core.security import gerar_hash_senha, verificar_senha
 from models import Usuario
 
+from typing import cast
+
 
 def criar_usuario(db: Session, username: str, senha: str):
 
@@ -39,7 +41,10 @@ def autenticar_usuario(db: Session, username: str, senha: str):
 
         raise CredenciaisInvalidas()
 
-    senha_valida = verificar_senha(senha, usuario.senha)
+    senha_valida = verificar_senha(
+    senha,
+    cast(str, usuario.senha),
+)
 
     if not senha_valida:
 

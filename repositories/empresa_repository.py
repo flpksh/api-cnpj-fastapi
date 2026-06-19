@@ -3,34 +3,61 @@ from sqlalchemy.orm import Session
 from models.empresa import Empresa
 
 
-def listar_empresas(db: Session):
+def buscar_por_usuario(
+    db: Session,
+    usuario_id: int,
+):
 
-    return db.query(Empresa).all()
+    return (
+        db.query(Empresa)
+        .filter(
+            Empresa.usuario_id == usuario_id,
+            Empresa.ativo,
+        )
+    )
 
 
-def buscar_empresa_por_cnpj(cnpj: str, db: Session):
+def buscar_por_cnpj(
+    db: Session,
+    cnpj: str,
+    usuario_id: int,
+):
 
-    return db.query(Empresa).filter(Empresa.cnpj == cnpj).first()
+    return (
+        db.query(Empresa)
+        .filter(
+            Empresa.cnpj == cnpj,
+            Empresa.usuario_id == usuario_id,
+            Empresa.ativo,
+        )
+        .first()
+    )
 
 
-def criar_empresa(nova_empresa: Empresa, db: Session):
+def criar(
+    db: Session,
+    empresa: Empresa,
+):
 
-    db.add(nova_empresa)
+    db.add(empresa)
 
     db.commit()
 
-    db.refresh(nova_empresa)
+    db.refresh(empresa)
 
-    return nova_empresa
+    return empresa
 
 
-def atualizar_empresa(db: Session):
+def atualizar(db: Session):
 
     db.commit()
 
 
-def deletar_empresa(empresa: Empresa, db: Session):
+def deletar(
+    db: Session,
+    empresa: Empresa,
+):
 
-    db.delete(empresa)
+    empresa.ativo = False
 
     db.commit()
