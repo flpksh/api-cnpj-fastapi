@@ -1,4 +1,6 @@
-from sqlalchemy.orm import Session
+from typing import Any
+
+from sqlalchemy.orm import InstrumentedAttribute, Query, Session
 
 from core.exceptions import EmpresaNaoEncontrada
 from core.logger import logger
@@ -14,20 +16,23 @@ def listar_empresas(
     estado: str | None = None,
     ordem: str = "id",
     direcao: str = "asc",
-):
-
+) -> Query[Empresa]:
     query = empresa_repository.buscar_por_usuario(
         db=db,
         usuario_id=usuario_id,
     )
 
     if cidade:
-        query = query.filter(Empresa.cidade.ilike(f"%{cidade}%"))
+        query = query.filter(
+            Empresa.cidade.ilike(f"%{cidade}%"),
+        )
 
     if estado:
-        query = query.filter(Empresa.estado.ilike(f"%{estado}%"))
+        query = query.filter(
+            Empresa.estado.ilike(f"%{estado}%"),
+        )
 
-    campos_validos = {
+    campos_validos: dict[str, InstrumentedAttribute[Any]] = {
         "id": Empresa.id,
         "nome": Empresa.nome,
         "cnpj": Empresa.cnpj,
@@ -49,8 +54,7 @@ def criar_empresa(
     db: Session,
     dados: EmpresaCreate,
     usuario_id: int,
-):
-
+) -> Empresa:
     empresa = Empresa(
         cnpj=dados.cnpj,
         nome=dados.nome,
@@ -64,7 +68,7 @@ def criar_empresa(
         empresa=empresa,
     )
 
-    logger.info(f"Empresa criada: {empresa.nome}")
+    logger.info("Empresa criada: %s", resultado.nome)
 
     return resultado
 
@@ -74,47 +78,44 @@ def atualizar_empresa(
     cnpj: str,
     dados: EmpresaCreate,
     usuario_id: int,
-):
-
+) -> Empresa:
     empresa = empresa_repository.buscar_por_cnpj(
         db=db,
         cnpj=cnpj,
         usuario_id=usuario_id,
     )
 
-    if not empresa:
-
-        logger.error(f"Empresa não encontrada: {cnpj}")
-
+    if empresa is None:
+        logger.error("Empresa não encontrada: %s", cnpj)
         raise EmpresaNaoEncontrada()
 
     empresa.nome = dados.nome
     empresa.cidade = dados.cidade
     empresa.estado = dados.estado
 
-    empresa_repository.atualizar(db)
+    resultado = empresa_repository.atualizar(
+        db=db,
+        empresa=empresa,
+    )
 
-    logger.info(f"Empresa atualizada: {cnpj}")
+    logger.info("Empresa atualizada: %s", cnpj)
 
-    return empresa
+    return resultado
 
 
 def deletar_empresa(
     db: Session,
     cnpj: str,
     usuario_id: int,
-):
-
+) -> dict[str, str]:
     empresa = empresa_repository.buscar_por_cnpj(
         db=db,
         cnpj=cnpj,
         usuario_id=usuario_id,
     )
 
-    if not empresa:
-
-        logger.error(f"Empresa não encontrada: {cnpj}")
-
+    if empresa is None:
+        logger.error("Empresa não encontrada: %s", cnpj)
         raise EmpresaNaoEncontrada()
 
     empresa_repository.deletar(
@@ -122,6 +123,6 @@ def deletar_empresa(
         empresa=empresa,
     )
 
-    logger.warning(f"Empresa removida: {cnpj}")
+    logger.warning("Empresa removida: %s", cnpj)
 
     return {"mensagem": "Empresa removida"}
