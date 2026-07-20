@@ -42,9 +42,9 @@ def autenticar_usuario(db: Session, username: str, senha: str):
         raise CredenciaisInvalidas()
 
     senha_valida = verificar_senha(
-    senha,
-    cast(str, usuario.senha),
-)
+        senha,
+        cast(str, usuario.senha),
+    )
 
     if not senha_valida:
 
