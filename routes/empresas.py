@@ -85,7 +85,7 @@ def criar_empresa(
         raise HTTPException(
             status_code=409,
             detail="CNPJ já cadastrado",
-        )
+        ) from None
 
     return {
         "success": True,
@@ -119,7 +119,7 @@ def atualizar_empresa(
         raise HTTPException(
             status_code=404,
             detail="Empresa não encontrada",
-        )
+        ) from None
 
     return {
         "success": True,
@@ -151,7 +151,7 @@ def deletar_empresa(
         raise HTTPException(
             status_code=404,
             detail="Empresa não encontrada",
-        )
+        ) from None
 
     return {
         "success": True,

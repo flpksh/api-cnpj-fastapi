@@ -1,11 +1,11 @@
+from typing import cast
+
 from sqlalchemy.orm import Session
 
 from core.exceptions import CredenciaisInvalidas, UsuarioJaExiste
 from core.logger import logger
 from core.security import gerar_hash_senha, verificar_senha
 from models import Usuario
-
-from typing import cast
 
 
 def criar_usuario(db: Session, username: str, senha: str):

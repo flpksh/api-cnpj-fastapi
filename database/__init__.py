@@ -1,30 +1,10 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import declarative_base, sessionmaker
+from database.base import Base
+from database.session import DATABASE_URL, SessionLocal, engine, get_db
 
-from core.config import settings
-
-DATABASE_URL = (
-    f"postgresql://"
-    f"{settings.DB_USER}:"
-    f"{settings.DB_PASSWORD}@"
-    f"{settings.DB_HOST}:"
-    f"{settings.DB_PORT}/"
-    f"{settings.DB_NAME}"
-)
-
-engine = create_engine(DATABASE_URL)
-
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-Base = declarative_base()
-
-
-def get_db():
-
-    db = SessionLocal()
-
-    try:
-        yield db
-
-    finally:
-        db.close()
+__all__ = [
+    "Base",
+    "DATABASE_URL",
+    "SessionLocal",
+    "engine",
+    "get_db",
+]
