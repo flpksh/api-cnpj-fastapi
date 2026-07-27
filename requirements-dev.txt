@@ -1,7 +1,10 @@
 -r requirements.txt
 
 black
+httpx
 isort
 mypy
 pytest
 ruff
+types-passlib
+types-python-jose
