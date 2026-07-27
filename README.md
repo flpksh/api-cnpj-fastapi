@@ -190,7 +190,7 @@ Preencha o `.env` com os dados do banco e uma chave secreta:
 
 ```env
 DB_HOST=localhost
-DB_PORT=5432
+DB_PORT=5433
 DB_USER=postgres
 DB_PASSWORD=postgres
 DB_NAME=cnpj_db
@@ -222,11 +222,16 @@ A aplicação fica disponível em:
 http://localhost:8000
 ```
 
-## Docker Compose
+## Executar com Docker Compose
 
-O projeto inclui `Dockerfile` e `docker-compose.yml`. A configuração atual do
-Compose ainda precisa ser alinhada às variáveis `DB_*` e de autenticação exigidas
-pela aplicação antes de ser usada como forma principal de execução.
+Depois de configurar o `.env`, inicie a API e o PostgreSQL:
+
+```bash
+docker compose up --build
+```
+
+A API fica disponível em `http://localhost:8000` e o PostgreSQL é exposto na
+porta `5433` da máquina local.
 
 ---
 
