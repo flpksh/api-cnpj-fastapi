@@ -30,6 +30,7 @@ O projeto foi desenvolvido utilizando uma arquitetura organizada em **Routes →
 
 * Docker
 * Docker Compose
+* GitHub Actions (CI)
 
 ### Testes
 
@@ -137,11 +138,29 @@ api_cnpj/
 
 | Método | Endpoint         | Descrição                    |
 | ------ | ---------------- | ---------------------------- |
-| GET    | /empresas        | Lista empresas               |
-| GET    | /empresas/{cnpj} | Busca empresa por CNPJ       |
-| POST   | /empresas        | Cadastra empresa             |
+| GET    | /empresas/       | Lista empresas               |
+| POST   | /empresas/       | Cadastra empresa             |
 | PUT    | /empresas/{cnpj} | Atualiza empresa             |
 | DELETE | /empresas/{cnpj} | Remove empresa (Soft Delete) |
+
+### Paginação, filtros e ordenação
+
+O endpoint `GET /empresas/` aceita os seguintes parâmetros de consulta:
+
+| Parâmetro | Padrão | Descrição                                  |
+| --------- | ------ | ------------------------------------------ |
+| page      | 1      | Página da listagem                         |
+| limit     | 10     | Quantidade de registros por página         |
+| cidade    | —      | Filtra empresas por cidade                 |
+| estado    | —      | Filtra empresas por estado                 |
+| ordem     | id     | Campo utilizado para ordenar os resultados |
+| direcao   | asc    | Direção da ordenação (`asc` ou `desc`)     |
+
+Exemplo:
+
+```text
+GET /empresas/?page=1&limit=10&estado=SC&ordem=nome&direcao=asc
+```
 
 ---
 
@@ -150,26 +169,64 @@ api_cnpj/
 ## Clonar o projeto
 
 ```bash
-git clone https://github.com/flpksh/api_cnpj.git
+git clone https://github.com/flpksh/api-cnpj-fastapi.git
 ```
 
 ```bash
-cd api_cnpj
+cd api-cnpj-fastapi
 ```
 
 ---
 
-## Executar com Docker
+## Configurar o ambiente
+
+Copie o arquivo de exemplo:
 
 ```bash
-docker compose up --build
+cp .env.example .env
 ```
 
-A aplicação ficará disponível em:
+Preencha o `.env` com os dados do banco e uma chave secreta:
 
+```env
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=postgres
+DB_NAME=cnpj_db
+SECRET_KEY=substitua-por-uma-chave-segura
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=60
 ```
+
+## Executar localmente
+
+Crie e ative um ambiente virtual, instale as dependências e aplique as migrações:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+alembic upgrade head
+```
+
+Inicie a API:
+
+```bash
+uvicorn main:app --reload
+```
+
+A aplicação fica disponível em:
+
+```text
 http://localhost:8000
 ```
+
+## Docker Compose
+
+O projeto inclui `Dockerfile` e `docker-compose.yml`. A configuração atual do
+Compose ainda precisa ser alinhada às variáveis `DB_*` e de autenticação exigidas
+pela aplicação antes de ser usada como forma principal de execução.
 
 ---
 
@@ -205,7 +262,8 @@ Fluxo de autenticação:
 
 # Estrutura das respostas
 
-A API retorna respostas padronizadas.
+A maioria das operações da API retorna respostas padronizadas. O login retorna
+diretamente o token de acesso, conforme descrito na documentação OpenAPI.
 
 ### Sucesso
 
@@ -248,12 +306,40 @@ A API retorna respostas padronizadas.
 
 # Próximas evoluções
 
-* Pipeline CI/CD
 * Deploy em ambiente cloud
 * Observabilidade com Prometheus e Grafana
 * Cache com Redis
 * Cobertura de testes ampliada
-* Integração contínua
+* Entrega contínua (CD)
+
+---
+
+# Qualidade e testes
+
+Instale as dependências de desenvolvimento:
+
+```bash
+python -m pip install -r requirements-dev.txt
+```
+
+Execute os testes:
+
+```bash
+pytest -v
+```
+
+Execute as mesmas verificações utilizadas pela integração contínua:
+
+```bash
+black --check .
+isort --check-only .
+ruff check .
+mypy .
+pytest -v
+```
+
+O workflow está definido em `.github/workflows/ci.yml` e é executado em pushes e
+pull requests direcionados à branch `main`.
 
 ---
 
