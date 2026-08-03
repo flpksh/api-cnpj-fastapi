@@ -161,18 +161,21 @@ O endpoint `GET /empresas/` aceita os seguintes parâmetros de consulta:
 
 | Parâmetro | Padrão | Descrição                                  |
 | --------- | ------ | ------------------------------------------ |
-| page      | 1      | Página da listagem                         |
-| limit     | 10     | Quantidade de registros por página         |
-| cidade    | —      | Filtra empresas por cidade                 |
-| estado    | —      | Filtra empresas por estado                 |
-| ordem     | id     | Campo utilizado para ordenar os resultados |
-| direcao   | asc    | Direção da ordenação (`asc` ou `desc`)     |
+| page      | 1      | Página da listagem (mínimo: 1)             |
+| limit     | 10     | Registros por página (entre 1 e 100)       |
+| cidade    | —      | Filtra por cidade (até 100 caracteres)     |
+| estado    | —      | Filtra por UF (duas letras)                |
+| ordem     | id     | `id`, `nome`, `cnpj`, `cidade` ou `estado` |
+| direcao   | asc    | `asc` ou `desc`                            |
 
 Exemplo:
 
 ```text
 GET /empresas/?page=1&limit=10&estado=SC&ordem=nome&direcao=asc
 ```
+
+Parâmetros inválidos ou desconhecidos retornam `422`. A resposta informa
+`page`, `limit`, `total` de registros e `pages` com o total de páginas.
 
 ---
 
