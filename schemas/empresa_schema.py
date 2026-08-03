@@ -1,21 +1,17 @@
-from pydantic import BaseModel, ConfigDict, field_validator
+from typing import Annotated
+
+from pydantic import BaseModel, BeforeValidator, ConfigDict
+
+from core.cnpj import validar_cnpj
+
+CNPJ = Annotated[str, BeforeValidator(validar_cnpj)]
 
 
 class EmpresaBase(BaseModel):
-    cnpj: str
+    cnpj: CNPJ
     nome: str
     cidade: str
     estado: str
-
-    @field_validator("cnpj")
-    def validar_cnpj(cls, v):
-
-        v = "".join(filter(str.isdigit, v))
-
-        if len(v) != 14:
-            raise ValueError("CNPJ deve conter 14 dígitos")
-
-        return v
 
 
 class EmpresaCreate(EmpresaBase):

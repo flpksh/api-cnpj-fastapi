@@ -49,6 +49,7 @@ O projeto foi desenvolvido utilizando uma arquitetura organizada em **Routes →
 ## Empresas
 
 * Cadastro de empresas
+* Validação de CNPJ numérico e alfanumérico
 * Listagem paginada
 * Consulta por CNPJ
 * Atualização de empresas
@@ -93,6 +94,7 @@ PostgreSQL
 api_cnpj/
 │
 ├── core/
+│   ├── cnpj.py
 │   ├── config.py
 │   ├── exceptions.py
 │   ├── logger.py
@@ -142,6 +144,16 @@ api_cnpj/
 | POST   | /empresas/       | Cadastra empresa             |
 | PUT    | /empresas/{cnpj} | Atualiza empresa             |
 | DELETE | /empresas/{cnpj} | Remove empresa (Soft Delete) |
+
+### Formato do CNPJ
+
+A API aceita o formato numérico tradicional e o novo formato alfanumérico,
+mantendo os dois últimos caracteres como dígitos verificadores. Pontos, barra e
+hífen são removidos, e letras são normalizadas para maiúsculas antes da
+validação pelo módulo 11.
+
+Exemplos válidos: `12.345.678/0001-95` e `12.ABC.345/01DE-35`. Nas rotas que
+recebem `{cnpj}`, use o valor sem pontuação, como `12ABC34501DE35`.
 
 ### Paginação, filtros e ordenação
 

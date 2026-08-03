@@ -35,7 +35,7 @@ def test_jornada_completa_usuario(client):
         "/empresas/",
         headers=headers,
         json={
-            "cnpj": "11111111000111",
+            "cnpj": "11111111000191",
             "nome": "Empresa Integração",
             "cidade": "Florianópolis",
             "estado": "SC",
@@ -47,7 +47,7 @@ def test_jornada_completa_usuario(client):
     empresa_body = empresa.json()
 
     assert empresa_body["success"] is True
-    assert empresa_body["data"]["cnpj"] == "11111111000111"
+    assert empresa_body["data"]["cnpj"] == "11111111000191"
     assert empresa_body["data"]["nome"] == "Empresa Integração"
 
     listagem = client.get("/empresas/", headers=headers)
@@ -60,13 +60,13 @@ def test_jornada_completa_usuario(client):
 
     assert len(listagem_body["data"]) == 1
 
-    assert listagem_body["data"][0]["cnpj"] == "11111111000111"
+    assert listagem_body["data"][0]["cnpj"] == "11111111000191"
 
     atualizacao = client.put(
-        "/empresas/11111111000111",
+        "/empresas/11111111000191",
         headers=headers,
         json={
-            "cnpj": "11111111000111",
+            "cnpj": "11111111000191",
             "nome": "Empresa Atualizada",
             "cidade": "São José",
             "estado": "SC",
@@ -81,7 +81,7 @@ def test_jornada_completa_usuario(client):
     assert body_atualizacao["data"]["cidade"] == "São José"
 
     delete = client.delete(
-        "/empresas/11111111000111",
+        "/empresas/11111111000191",
         headers=headers,
     )
 

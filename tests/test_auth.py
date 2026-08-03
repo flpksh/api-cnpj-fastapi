@@ -134,6 +134,43 @@ def test_create_empresa_success(client):
     assert "id" in empresa
 
 
+def test_create_and_update_empresa_with_alphanumeric_cnpj(client):
+    username = f"user_{uuid4().hex}"
+    client.post("/auth/register", json={"username": username, "senha": "123456"})
+    login = client.post(
+        "/auth/login", data={"username": username, "password": "123456"}
+    )
+    headers = {"Authorization": f"Bearer {login.json()['access_token']}"}
+
+    create = client.post(
+        "/empresas/",
+        headers=headers,
+        json={
+            "cnpj": "12.abc.345/01de-35",
+            "nome": "Empresa Alfanumérica",
+            "cidade": "Florianópolis",
+            "estado": "SC",
+        },
+    )
+
+    assert create.status_code == 200
+    assert create.json()["data"]["cnpj"] == "12ABC34501DE35"
+
+    update = client.put(
+        "/empresas/12abc34501de35",
+        headers=headers,
+        json={
+            "cnpj": "12ABC34501DE35",
+            "nome": "Empresa Alfanumérica Atualizada",
+            "cidade": "São José",
+            "estado": "SC",
+        },
+    )
+
+    assert update.status_code == 200
+    assert update.json()["data"]["nome"] == "Empresa Alfanumérica Atualizada"
+
+
 def test_create_empresa_invalid_cnpj(client):
     username = f"user_{uuid4().hex}"
 
@@ -244,7 +281,7 @@ def test_list_empresas_only_owner(client):
         "/empresas/",
         headers={"Authorization": f"Bearer {token_a}"},
         json={
-            "cnpj": "11111111000111",
+            "cnpj": "11111111000191",
             "nome": "Empresa A",
             "cidade": "Florianópolis",
             "estado": "SC",
@@ -267,7 +304,7 @@ def test_list_empresas_only_owner(client):
         "/empresas/",
         headers={"Authorization": f"Bearer {token_b}"},
         json={
-            "cnpj": "22222222000122",
+            "cnpj": "22222222000191",
             "nome": "Empresa B",
             "cidade": "São Paulo",
             "estado": "SP",
@@ -285,7 +322,7 @@ def test_list_empresas_only_owner(client):
 
     assert len(empresas) == 1
     assert empresas[0]["nome"] == "Empresa A"
-    assert empresas[0]["cnpj"] == "11111111000111"
+    assert empresas[0]["cnpj"] == "11111111000191"
 
 
 def test_update_empresa_success(client):
@@ -303,7 +340,7 @@ def test_update_empresa_success(client):
         "/empresas/",
         headers={"Authorization": f"Bearer {token}"},
         json={
-            "cnpj": "33333333000133",
+            "cnpj": "33333333000191",
             "nome": "Empresa Original",
             "cidade": "Florianópolis",
             "estado": "SC",
@@ -311,10 +348,10 @@ def test_update_empresa_success(client):
     )
 
     response = client.put(
-        "/empresas/33333333000133",
+        "/empresas/33333333000191",
         headers={"Authorization": f"Bearer {token}"},
         json={
-            "cnpj": "33333333000133",
+            "cnpj": "33333333000191",
             "nome": "Empresa Atualizada",
             "cidade": "Joinville",
             "estado": "SC",
@@ -352,7 +389,7 @@ def test_update_empresa_other_user_forbidden(client):
         "/empresas/",
         headers={"Authorization": f"Bearer {token_a}"},
         json={
-            "cnpj": "44444444000144",
+            "cnpj": "44444444000191",
             "nome": "Empresa do Usuário A",
             "cidade": "Florianópolis",
             "estado": "SC",
@@ -372,10 +409,10 @@ def test_update_empresa_other_user_forbidden(client):
 
     # Usuário B tenta atualizar empresa do A
     response = client.put(
-        "/empresas/44444444000144",
+        "/empresas/44444444000191",
         headers={"Authorization": f"Bearer {token_b}"},
         json={
-            "cnpj": "44444444000144",
+            "cnpj": "44444444000191",
             "nome": "Tentativa de Invasão",
             "cidade": "São Paulo",
             "estado": "SP",
@@ -415,7 +452,7 @@ def test_delete_empresa_success(client):
         "/empresas/",
         headers={"Authorization": f"Bearer {token}"},
         json={
-            "cnpj": "55555555000155",
+            "cnpj": "55555555000191",
             "nome": "Empresa Delete",
             "cidade": "Florianópolis",
             "estado": "SC",
@@ -424,7 +461,7 @@ def test_delete_empresa_success(client):
 
     # remove empresa
     response = client.delete(
-        "/empresas/55555555000155",
+        "/empresas/55555555000191",
         headers={"Authorization": f"Bearer {token}"},
     )
 
@@ -461,7 +498,7 @@ def test_soft_delete_removes_empresa_from_listing(client):
     headers = {"Authorization": f"Bearer {token}"}
 
     payload = {
-        "cnpj": "66666666000166",
+        "cnpj": "66666666000191",
         "nome": "Empresa Soft Delete",
         "cidade": "Florianópolis",
         "estado": "SC",
@@ -488,7 +525,7 @@ def test_soft_delete_removes_empresa_from_listing(client):
 
     # Remove empresa
     delete = client.delete(
-        "/empresas/66666666000166",
+        "/empresas/66666666000191",
         headers=headers,
     )
 
@@ -534,7 +571,7 @@ def test_delete_empresa_twice(client):
         "/empresas/",
         headers=headers,
         json={
-            "cnpj": "77777777000177",
+            "cnpj": "77777777000191",
             "nome": "Empresa Delete Twice",
             "cidade": "Florianópolis",
             "estado": "SC",
@@ -542,14 +579,14 @@ def test_delete_empresa_twice(client):
     )
 
     primeira = client.delete(
-        "/empresas/77777777000177",
+        "/empresas/77777777000191",
         headers=headers,
     )
 
     assert primeira.status_code == 200
 
     segunda = client.delete(
-        "/empresas/77777777000177",
+        "/empresas/77777777000191",
         headers=headers,
     )
 
@@ -587,7 +624,7 @@ def test_delete_empresa_other_user_forbidden(client):
         "/empresas/",
         headers={"Authorization": f"Bearer {token_a}"},
         json={
-            "cnpj": "88888888000188",
+            "cnpj": "88888888000191",
             "nome": "Empresa do Usuário A",
             "cidade": "Florianópolis",
             "estado": "SC",
@@ -617,7 +654,7 @@ def test_delete_empresa_other_user_forbidden(client):
 
     # Usuário B tenta excluir empresa do A
     response = client.delete(
-        "/empresas/88888888000188",
+        "/empresas/88888888000191",
         headers={"Authorization": f"Bearer {token_b}"},
     )
 
@@ -650,10 +687,10 @@ def test_update_empresa_not_found(client):
     token = login.json()["access_token"]
 
     response = client.put(
-        "/empresas/99999999000199",
+        "/empresas/99999999000191",
         headers={"Authorization": f"Bearer {token}"},
         json={
-            "cnpj": "99999999000199",
+            "cnpj": "99999999000191",
             "nome": "Empresa Inexistente",
             "cidade": "São Paulo",
             "estado": "SP",

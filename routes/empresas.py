@@ -6,7 +6,7 @@ from core.exceptions import EmpresaNaoEncontrada
 from core.security import obter_usuario_atual
 from database import get_db
 from models.usuario import Usuario
-from schemas.empresa_schema import EmpresaCreate
+from schemas.empresa_schema import CNPJ, EmpresaCreate
 from services import empresa_service
 
 router = APIRouter(prefix="/empresas", tags=["Empresas"])
@@ -99,7 +99,7 @@ def criar_empresa(
 
 @router.put("/{cnpj}")
 def atualizar_empresa(
-    cnpj: str,
+    cnpj: CNPJ,
     dados: EmpresaCreate,
     db: Session = Depends(get_db),
     usuario: Usuario = Depends(obter_usuario_atual),
@@ -133,7 +133,7 @@ def atualizar_empresa(
 
 @router.delete("/{cnpj}")
 def deletar_empresa(
-    cnpj: str,
+    cnpj: CNPJ,
     db: Session = Depends(get_db),
     usuario: Usuario = Depends(obter_usuario_atual),
 ):
