@@ -5,7 +5,7 @@ def test_register(client):
     username = f"user_test_{uuid4().hex}"
 
     response = client.post(
-        "/auth/register", json={"username": username, "senha": "123456"}
+        "/auth/register", json={"username": username, "senha": "senha-segura-123"}
     )
 
     assert response.status_code == 200
@@ -13,10 +13,12 @@ def test_register(client):
 
 
 def test_login(client):
-    client.post("/auth/register", json={"username": "user_login", "senha": "123456"})
+    client.post(
+        "/auth/register", json={"username": "user_login", "senha": "senha-segura-123"}
+    )
 
     response = client.post(
-        "/auth/login", data={"username": "user_login", "password": "123456"}
+        "/auth/login", data={"username": "user_login", "password": "senha-segura-123"}
     )
 
     assert response.status_code == 200
@@ -27,10 +29,12 @@ def test_login(client):
 
 
 def test_protected_route(client):
-    client.post("/auth/register", json={"username": "user_token", "senha": "123456"})
+    client.post(
+        "/auth/register", json={"username": "user_token", "senha": "senha-segura-123"}
+    )
 
     login = client.post(
-        "/auth/login", data={"username": "user_token", "password": "123456"}
+        "/auth/login", data={"username": "user_token", "password": "senha-segura-123"}
     )
 
     token = login.json()["access_token"]
@@ -44,13 +48,13 @@ def test_register_duplicate_user(client):
     username = f"user_{uuid4().hex}"
 
     response_1 = client.post(
-        "/auth/register", json={"username": username, "senha": "123456"}
+        "/auth/register", json={"username": username, "senha": "senha-segura-123"}
     )
 
     assert response_1.status_code == 200
 
     response_2 = client.post(
-        "/auth/register", json={"username": username, "senha": "123456"}
+        "/auth/register", json={"username": username, "senha": "senha-segura-123"}
     )
 
     assert response_2.status_code == 409
@@ -59,7 +63,9 @@ def test_register_duplicate_user(client):
 def test_login_invalid_password(client):
     username = f"user_{uuid4().hex}"
 
-    client.post("/auth/register", json={"username": username, "senha": "123456"})
+    client.post(
+        "/auth/register", json={"username": username, "senha": "senha-segura-123"}
+    )
 
     response = client.post(
         "/auth/login", data={"username": username, "password": "senha_errada"}
@@ -70,7 +76,8 @@ def test_login_invalid_password(client):
 
 def test_login_nonexistent_user(client):
     response = client.post(
-        "/auth/login", data={"username": f"user_{uuid4().hex}", "password": "123456"}
+        "/auth/login",
+        data={"username": f"user_{uuid4().hex}", "password": "senha-segura-123"},
     )
 
     assert response.status_code == 401
@@ -96,11 +103,13 @@ def test_create_empresa_success(client):
     username = f"user_{uuid4().hex}"
 
     # Registro
-    client.post("/auth/register", json={"username": username, "senha": "123456"})
+    client.post(
+        "/auth/register", json={"username": username, "senha": "senha-segura-123"}
+    )
 
     # Login
     login = client.post(
-        "/auth/login", data={"username": username, "password": "123456"}
+        "/auth/login", data={"username": username, "password": "senha-segura-123"}
     )
 
     token = login.json()["access_token"]
@@ -136,9 +145,11 @@ def test_create_empresa_success(client):
 
 def test_create_and_update_empresa_with_alphanumeric_cnpj(client):
     username = f"user_{uuid4().hex}"
-    client.post("/auth/register", json={"username": username, "senha": "123456"})
+    client.post(
+        "/auth/register", json={"username": username, "senha": "senha-segura-123"}
+    )
     login = client.post(
-        "/auth/login", data={"username": username, "password": "123456"}
+        "/auth/login", data={"username": username, "password": "senha-segura-123"}
     )
     headers = {"Authorization": f"Bearer {login.json()['access_token']}"}
 
@@ -175,11 +186,13 @@ def test_create_empresa_invalid_cnpj(client):
     username = f"user_{uuid4().hex}"
 
     # Registro
-    client.post("/auth/register", json={"username": username, "senha": "123456"})
+    client.post(
+        "/auth/register", json={"username": username, "senha": "senha-segura-123"}
+    )
 
     # Login
     login = client.post(
-        "/auth/login", data={"username": username, "password": "123456"}
+        "/auth/login", data={"username": username, "password": "senha-segura-123"}
     )
 
     token = login.json()["access_token"]
@@ -206,10 +219,12 @@ def test_create_empresa_invalid_cnpj(client):
 def test_create_empresa_duplicate_cnpj(client):
     username = f"user_{uuid4().hex}"
 
-    client.post("/auth/register", json={"username": username, "senha": "123456"})
+    client.post(
+        "/auth/register", json={"username": username, "senha": "senha-segura-123"}
+    )
 
     login = client.post(
-        "/auth/login", data={"username": username, "password": "123456"}
+        "/auth/login", data={"username": username, "password": "senha-segura-123"}
     )
 
     token = login.json()["access_token"]
@@ -245,10 +260,12 @@ def test_create_empresa_duplicate_cnpj(client):
 def test_list_empresas_empty(client):
     username = f"user_{uuid4().hex}"
 
-    client.post("/auth/register", json={"username": username, "senha": "123456"})
+    client.post(
+        "/auth/register", json={"username": username, "senha": "senha-segura-123"}
+    )
 
     login = client.post(
-        "/auth/login", data={"username": username, "password": "123456"}
+        "/auth/login", data={"username": username, "password": "senha-segura-123"}
     )
 
     token = login.json()["access_token"]
@@ -268,10 +285,12 @@ def test_list_empresas_only_owner(client):
     # Usuário A
     username_a = f"user_a_{uuid4().hex}"
 
-    client.post("/auth/register", json={"username": username_a, "senha": "123456"})
+    client.post(
+        "/auth/register", json={"username": username_a, "senha": "senha-segura-123"}
+    )
 
     login_a = client.post(
-        "/auth/login", data={"username": username_a, "password": "123456"}
+        "/auth/login", data={"username": username_a, "password": "senha-segura-123"}
     )
 
     token_a = login_a.json()["access_token"]
@@ -291,10 +310,12 @@ def test_list_empresas_only_owner(client):
     # Usuário B
     username_b = f"user_b_{uuid4().hex}"
 
-    client.post("/auth/register", json={"username": username_b, "senha": "123456"})
+    client.post(
+        "/auth/register", json={"username": username_b, "senha": "senha-segura-123"}
+    )
 
     login_b = client.post(
-        "/auth/login", data={"username": username_b, "password": "123456"}
+        "/auth/login", data={"username": username_b, "password": "senha-segura-123"}
     )
 
     token_b = login_b.json()["access_token"]
@@ -328,10 +349,12 @@ def test_list_empresas_only_owner(client):
 def test_update_empresa_success(client):
     username = f"user_{uuid4().hex}"
 
-    client.post("/auth/register", json={"username": username, "senha": "123456"})
+    client.post(
+        "/auth/register", json={"username": username, "senha": "senha-segura-123"}
+    )
 
     login = client.post(
-        "/auth/login", data={"username": username, "password": "123456"}
+        "/auth/login", data={"username": username, "password": "senha-segura-123"}
     )
 
     token = login.json()["access_token"]
@@ -376,10 +399,12 @@ def test_update_empresa_other_user_forbidden(client):
     # Usuário A
     username_a = f"user_a_{uuid4().hex}"
 
-    client.post("/auth/register", json={"username": username_a, "senha": "123456"})
+    client.post(
+        "/auth/register", json={"username": username_a, "senha": "senha-segura-123"}
+    )
 
     login_a = client.post(
-        "/auth/login", data={"username": username_a, "password": "123456"}
+        "/auth/login", data={"username": username_a, "password": "senha-segura-123"}
     )
 
     token_a = login_a.json()["access_token"]
@@ -399,10 +424,12 @@ def test_update_empresa_other_user_forbidden(client):
     # Usuário B
     username_b = f"user_b_{uuid4().hex}"
 
-    client.post("/auth/register", json={"username": username_b, "senha": "123456"})
+    client.post(
+        "/auth/register", json={"username": username_b, "senha": "senha-segura-123"}
+    )
 
     login_b = client.post(
-        "/auth/login", data={"username": username_b, "password": "123456"}
+        "/auth/login", data={"username": username_b, "password": "senha-segura-123"}
     )
 
     token_b = login_b.json()["access_token"]
@@ -433,7 +460,7 @@ def test_delete_empresa_success(client):
         "/auth/register",
         json={
             "username": username,
-            "senha": "123456",
+            "senha": "senha-segura-123",
         },
     )
 
@@ -441,7 +468,7 @@ def test_delete_empresa_success(client):
         "/auth/login",
         data={
             "username": username,
-            "password": "123456",
+            "password": "senha-segura-123",
         },
     )
 
@@ -481,7 +508,7 @@ def test_soft_delete_removes_empresa_from_listing(client):
         "/auth/register",
         json={
             "username": username,
-            "senha": "123456",
+            "senha": "senha-segura-123",
         },
     )
 
@@ -489,7 +516,7 @@ def test_soft_delete_removes_empresa_from_listing(client):
         "/auth/login",
         data={
             "username": username,
-            "password": "123456",
+            "password": "senha-segura-123",
         },
     )
 
@@ -551,7 +578,7 @@ def test_delete_empresa_twice(client):
         "/auth/register",
         json={
             "username": username,
-            "senha": "123456",
+            "senha": "senha-segura-123",
         },
     )
 
@@ -559,7 +586,7 @@ def test_delete_empresa_twice(client):
         "/auth/login",
         data={
             "username": username,
-            "password": "123456",
+            "password": "senha-segura-123",
         },
     )
 
@@ -605,7 +632,7 @@ def test_delete_empresa_other_user_forbidden(client):
         "/auth/register",
         json={
             "username": username_a,
-            "senha": "123456",
+            "senha": "senha-segura-123",
         },
     )
 
@@ -613,7 +640,7 @@ def test_delete_empresa_other_user_forbidden(client):
         "/auth/login",
         data={
             "username": username_a,
-            "password": "123456",
+            "password": "senha-segura-123",
         },
     )
 
@@ -638,7 +665,7 @@ def test_delete_empresa_other_user_forbidden(client):
         "/auth/register",
         json={
             "username": username_b,
-            "senha": "123456",
+            "senha": "senha-segura-123",
         },
     )
 
@@ -646,7 +673,7 @@ def test_delete_empresa_other_user_forbidden(client):
         "/auth/login",
         data={
             "username": username_b,
-            "password": "123456",
+            "password": "senha-segura-123",
         },
     )
 
@@ -672,7 +699,7 @@ def test_update_empresa_not_found(client):
         "/auth/register",
         json={
             "username": username,
-            "senha": "123456",
+            "senha": "senha-segura-123",
         },
     )
 
@@ -680,7 +707,7 @@ def test_update_empresa_not_found(client):
         "/auth/login",
         data={
             "username": username,
-            "password": "123456",
+            "password": "senha-segura-123",
         },
     )
 

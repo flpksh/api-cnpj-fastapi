@@ -23,8 +23,8 @@ O projeto foi desenvolvido utilizando uma arquitetura organizada em **Routes →
 
 ### Segurança
 
-* JWT Authentication
-* Hash de senhas
+* JWT Authentication com expiração obrigatória
+* Hash de senhas com Argon2id e migração automática de bcrypt
 
 ### DevOps
 
@@ -42,7 +42,7 @@ O projeto foi desenvolvido utilizando uma arquitetura organizada em **Routes →
 
 ## Autenticação
 
-* Cadastro de usuários
+* Cadastro de usuários com validação de credenciais
 * Login com JWT
 * Proteção de rotas autenticadas
 
@@ -209,7 +209,7 @@ DB_PORT=5433
 DB_USER=postgres
 DB_PASSWORD=postgres
 DB_NAME=cnpj_db
-SECRET_KEY=substitua-por-uma-chave-segura
+SECRET_KEY=
 ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=60
 ```
@@ -268,7 +268,14 @@ http://localhost:8000/redoc
 
 # Autenticação
 
-A API utiliza autenticação baseada em **JWT Bearer Token**.
+A API utiliza autenticação baseada em **JWT Bearer Token**. A chave JWT deve
+ter pelo menos 32 caracteres e pode ser gerada com
+`python -c "import secrets; print(secrets.token_hex(32))"`.
+
+Novos usuários precisam informar um identificador de 3 a 50 caracteres, usando
+letras, números, ponto, hífen ou sublinhado. A senha deve ter entre 15
+caracteres e 72 bytes. Novos hashes usam Argon2id; hashes bcrypt existentes são
+migrados automaticamente após um login válido.
 
 Fluxo de autenticação:
 

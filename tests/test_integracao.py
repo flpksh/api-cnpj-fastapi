@@ -6,7 +6,7 @@ def test_jornada_completa_usuario(client):
     username = f"user_integracao_{uuid4().hex}"
 
     registro = client.post(
-        "/auth/register", json={"username": username, "senha": "123456"}
+        "/auth/register", json={"username": username, "senha": "senha-segura-123"}
     )
 
     assert registro.status_code == 200
@@ -17,7 +17,7 @@ def test_jornada_completa_usuario(client):
     assert "id" in body["data"]
 
     login = client.post(
-        "/auth/login", data={"username": username, "password": "123456"}
+        "/auth/login", data={"username": username, "password": "senha-segura-123"}
     )
 
     assert login.status_code == 200

@@ -42,7 +42,7 @@ jobs:
       DB_HOST: localhost
       DB_PORT: "5432"
       DB_NAME: cnpj_db
-      SECRET_KEY: ci-secret-key
+      SECRET_KEY: ci-only-secret-key-with-at-least-32-chars
       ALGORITHM: HS256
       ACCESS_TOKEN_EXPIRE_MINUTES: "30"
       RUN_POSTGRES_TESTS: "1"

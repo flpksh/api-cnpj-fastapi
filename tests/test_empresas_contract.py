@@ -7,11 +7,11 @@ def autenticar(client) -> dict[str, str]:
     username = f"user_contract_{uuid4().hex}"
     client.post(
         "/auth/register",
-        json={"username": username, "senha": "123456"},
+        json={"username": username, "senha": "senha-segura-123"},
     )
     login = client.post(
         "/auth/login",
-        data={"username": username, "password": "123456"},
+        data={"username": username, "password": "senha-segura-123"},
     )
     return {"Authorization": f"Bearer {login.json()['access_token']}"}
 
