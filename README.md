@@ -98,6 +98,7 @@ api_cnpj/
 │   ├── config.py
 │   ├── exceptions.py
 │   ├── logger.py
+│   ├── middleware.py
 │   ├── responses.py
 │   └── security.py
 │
@@ -133,6 +134,17 @@ api_cnpj/
 | ------ | -------------- | ---------------------- |
 | POST   | /auth/register | Cadastro de usuário    |
 | POST   | /auth/login    | Login e geração do JWT |
+
+## Operação
+
+| Método | Endpoint      | Descrição                             |
+| ------ | ------------- | ------------------------------------- |
+| GET    | /health/live  | Confirma que o processo está ativo    |
+| GET    | /health/ready | Confirma o acesso da aplicação ao banco |
+
+Todas as respostas incluem o cabeçalho `X-Request-ID`. Um identificador válido
+enviado pelo cliente é preservado; caso contrário, a API gera um UUID. Os logs
+são enviados para a saída padrão com método, caminho, status e duração.
 
 ---
 
@@ -248,6 +260,10 @@ docker compose up --build
 A API fica disponível em `http://localhost:8000` e o PostgreSQL é exposto na
 porta `5433` da máquina local.
 
+O Compose exige uma `SECRET_KEY` preenchida e não inicia com um placeholder de
+desenvolvimento. O container da API executa como usuário sem privilégios e usa
+`/health/ready` para informar seu estado ao Docker.
+
 ---
 
 # Documentação da API
@@ -327,6 +343,8 @@ diretamente o token de acesso, conforme descrito na documentação OpenAPI.
 * Documentação automática com Swagger/OpenAPI
 * Migrações de banco com Alembic
 * Conteinerização com Docker
+* Health checks de liveness e readiness
+* Logs correlacionados por `X-Request-ID`
 * Testes automatizados com Pytest
 
 ---

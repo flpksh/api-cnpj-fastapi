@@ -7,10 +7,16 @@ from core.exceptions import (
     UsuarioJaExiste,
     UsuarioNaoEncontrado,
 )
+from core.middleware import adicionar_contexto_requisicao
 from routes.auth import router as auth_router
 from routes.empresas import router as empresas_router
+from routes.health import router as health_router
 
-app = FastAPI()
+app = FastAPI(
+    title="API CNPJ",
+    version="1.0.0",
+)
+app.middleware("http")(adicionar_contexto_requisicao)
 
 
 @app.exception_handler(EmpresaNaoEncontrada)
@@ -42,6 +48,7 @@ async def credenciais_handler(request: Request, exc: CredenciaisInvalidas):
 
 app.include_router(auth_router)
 app.include_router(empresas_router)
+app.include_router(health_router)
 
 
 @app.get("/")

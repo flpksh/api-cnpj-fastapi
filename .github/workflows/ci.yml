@@ -78,6 +78,12 @@ jobs:
       - name: Check types with MyPy
         run: mypy .
 
+      - name: Validate Dockerfile
+        run: docker build --check .
+
+      - name: Validate Docker Compose
+        run: docker compose config --quiet
+
       - name: Apply database migrations
         run: alembic upgrade head
 
