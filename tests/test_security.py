@@ -1,7 +1,7 @@
 from datetime import timedelta
 
+import jwt
 import pytest
-from jose import jwt
 from passlib.context import CryptContext
 from pydantic import SecretStr, ValidationError
 
