@@ -32,9 +32,19 @@ class EmpresaListParams(BaseModel):
 
 class EmpresaBase(BaseModel):
     cnpj: CNPJ
-    nome: str
-    cidade: str
-    estado: str
+    nome: str = Field(min_length=1, max_length=200)
+    cidade: str = Field(min_length=1, max_length=100)
+    estado: str = Field(pattern=r"^[A-Z]{2}$")
+
+    @field_validator("nome", "cidade", mode="before")
+    @classmethod
+    def normalizar_texto(cls, valor: object) -> object:
+        return valor.strip() if isinstance(valor, str) else valor
+
+    @field_validator("estado", mode="before")
+    @classmethod
+    def normalizar_uf(cls, valor: object) -> object:
+        return valor.strip().upper() if isinstance(valor, str) else valor
 
 
 class EmpresaCreate(EmpresaBase):

@@ -14,6 +14,8 @@ class Settings(BaseSettings):
     SECRET_KEY: SecretStr = Field(min_length=32)
     ALGORITHM: Literal["HS256", "HS384", "HS512"]
     ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(gt=0, le=1440)
+    LOGIN_RATE_LIMIT_REQUESTS: int = Field(default=5, ge=1, le=100)
+    LOGIN_RATE_LIMIT_WINDOW_SECONDS: int = Field(default=60, ge=1, le=3600)
 
     model_config = SettingsConfigDict(
         env_file=".env",

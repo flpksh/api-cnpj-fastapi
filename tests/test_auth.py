@@ -83,6 +83,23 @@ def test_login_nonexistent_user(client):
     assert response.status_code == 401
 
 
+def test_login_rate_limit(client):
+    for _ in range(5):
+        response = client.post(
+            "/auth/login",
+            data={"username": "inexistente", "password": "senha-segura-123"},
+        )
+        assert response.status_code == 401
+
+    blocked = client.post(
+        "/auth/login",
+        data={"username": "inexistente", "password": "senha-segura-123"},
+    )
+
+    assert blocked.status_code == 429
+    assert "Retry-After" in blocked.headers
+
+
 def test_protected_route_without_token(client):
     response = client.get("/empresas/")
 
@@ -344,6 +361,36 @@ def test_list_empresas_only_owner(client):
     assert len(empresas) == 1
     assert empresas[0]["nome"] == "Empresa A"
     assert empresas[0]["cnpj"] == "11111111000191"
+
+
+def test_same_cnpj_can_belong_to_different_users(client):
+    tokens = []
+    for suffix in ("a", "b"):
+        username = f"owner_{suffix}_{uuid4().hex}"
+        client.post(
+            "/auth/register",
+            json={"username": username, "senha": "senha-segura-123"},
+        )
+        login = client.post(
+            "/auth/login",
+            data={"username": username, "password": "senha-segura-123"},
+        )
+        tokens.append(login.json()["access_token"])
+
+    payload = {
+        "cnpj": "12345678000195",
+        "nome": "Empresa Compartilhada",
+        "cidade": "Florianópolis",
+        "estado": "SC",
+    }
+
+    for token in tokens:
+        response = client.post(
+            "/empresas/",
+            headers={"Authorization": f"Bearer {token}"},
+            json=payload,
+        )
+        assert response.status_code == 200
 
 
 def test_update_empresa_success(client):

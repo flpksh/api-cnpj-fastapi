@@ -68,7 +68,7 @@ def criar_empresa(
         empresa=empresa,
     )
 
-    logger.info("Empresa criada: %s", resultado.nome)
+    logger.info("Empresa criada id=%s usuario_id=%s", resultado.id, usuario_id)
 
     return resultado
 
@@ -86,7 +86,7 @@ def atualizar_empresa(
     )
 
     if empresa is None:
-        logger.error("Empresa não encontrada: %s", cnpj)
+        logger.warning("Empresa não encontrada usuario_id=%s", usuario_id)
         raise EmpresaNaoEncontrada()
 
     empresa.nome = dados.nome
@@ -98,7 +98,7 @@ def atualizar_empresa(
         empresa=empresa,
     )
 
-    logger.info("Empresa atualizada: %s", cnpj)
+    logger.info("Empresa atualizada id=%s usuario_id=%s", resultado.id, usuario_id)
 
     return resultado
 
@@ -115,7 +115,7 @@ def deletar_empresa(
     )
 
     if empresa is None:
-        logger.error("Empresa não encontrada: %s", cnpj)
+        logger.warning("Empresa não encontrada usuario_id=%s", usuario_id)
         raise EmpresaNaoEncontrada()
 
     empresa_repository.deletar(
@@ -123,6 +123,6 @@ def deletar_empresa(
         empresa=empresa,
     )
 
-    logger.warning("Empresa removida: %s", cnpj)
+    logger.info("Empresa removida id=%s usuario_id=%s", empresa.id, usuario_id)
 
     return {"mensagem": "Empresa removida"}

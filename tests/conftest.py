@@ -3,6 +3,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+from core.rate_limit import resetar_rate_limit
 from database import Base, get_db
 from main import app
 
@@ -22,6 +23,7 @@ TestingSessionLocal = sessionmaker(
 
 @pytest.fixture(scope="function")
 def db():
+    resetar_rate_limit()
     Base.metadata.create_all(bind=engine)
 
     db = TestingSessionLocal()
@@ -31,6 +33,7 @@ def db():
     finally:
         db.close()
         Base.metadata.drop_all(bind=engine)
+        resetar_rate_limit()
 
 
 @pytest.fixture

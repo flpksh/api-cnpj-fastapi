@@ -258,7 +258,7 @@ docker compose up --build
 ```
 
 A API fica disponível em `http://localhost:8000` e o PostgreSQL é exposto na
-porta `5433` da máquina local.
+porta `5434` da máquina local.
 
 O Compose exige uma `SECRET_KEY` preenchida e não inicia com um placeholder de
 desenvolvimento. O container da API executa como usuário sem privilégios e usa
@@ -345,7 +345,9 @@ diretamente o token de acesso, conforme descrito na documentação OpenAPI.
 * Conteinerização com Docker
 * Health checks de liveness e readiness
 * Logs correlacionados por `X-Request-ID`
+* Rate limiting de tentativas de login
 * Testes automatizados com Pytest
+* Cobertura mínima de 85%
 
 ---
 
@@ -370,7 +372,7 @@ python -m pip install -r requirements-dev.txt
 Execute os testes:
 
 ```bash
-pytest -v
+pytest --cov --cov-report=term-missing
 ```
 
 Execute as mesmas verificações utilizadas pela integração contínua:
@@ -385,6 +387,18 @@ pytest -v
 
 O workflow está definido em `.github/workflows/ci.yml` e é executado em pushes e
 pull requests direcionados à branch `main`.
+
+O limite padrão de login é de 5 tentativas por endereço em 60 segundos. Em
+execuções com múltiplas instâncias, substitua o armazenamento em memória por
+um backend compartilhado, como Redis.
+
+## Portas locais
+
+Por padrão, a API usa `8000` e o PostgreSQL usa `5434` na máquina local. As
+portas podem ser alteradas por `API_HOST_PORT` e `DB_HOST_PORT` no `.env`.
+
+A combinação `(usuario_id, cnpj)` é única: usuários diferentes podem cadastrar
+a mesma empresa sem quebrar o isolamento de propriedade.
 
 ---
 
