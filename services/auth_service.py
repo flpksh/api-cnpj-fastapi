@@ -29,7 +29,7 @@ def criar_usuario(
     )
 
     if usuario_existente:
-        logger.warning("Tentativa de registro com usuário existente: %r", username)
+        logger.warning("Tentativa de registro com usuário existente")
         raise UsuarioJaExiste()
 
     novo_usuario = Usuario(username=username, senha=gerar_hash_senha(senha))
@@ -39,11 +39,11 @@ def criar_usuario(
         db.commit()
     except IntegrityError as erro:
         db.rollback()
-        logger.warning("Conflito ao registrar usuário: %r", username)
+        logger.warning("Conflito ao registrar usuário")
         raise UsuarioJaExiste() from erro
 
     db.refresh(novo_usuario)
-    logger.info("Usuário criado: %r", username)
+    logger.info("Usuário criado id=%s", novo_usuario.id)
 
     return novo_usuario
 
@@ -78,5 +78,5 @@ def autenticar_usuario(
         db.commit()
         db.refresh(usuario)
 
-    logger.info("Login realizado: %r", username)
+    logger.info("Login realizado usuario_id=%s", usuario.id)
     return usuario

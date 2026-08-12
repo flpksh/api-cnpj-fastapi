@@ -5,6 +5,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 from core.config import settings
+from core.rate_limit import limitar_login
 from core.security import criar_token
 from database import get_db
 from schemas.usuario_schema import (
@@ -14,7 +15,7 @@ from schemas.usuario_schema import (
 )
 from services.auth_service import autenticar_usuario, criar_usuario
 
-router = APIRouter(prefix="/auth", tags=["Auth"])
+router = APIRouter(prefix="/auth", tags=["Auth"], dependencies=[Depends(limitar_login)])
 
 
 @router.post("/register", response_model=UsuarioCreateResponse)

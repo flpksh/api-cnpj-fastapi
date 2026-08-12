@@ -88,4 +88,4 @@ jobs:
         run: alembic upgrade head
 
       - name: Run tests
-        run: pytest -v
+        run: pytest --cov --cov-report=term-missing

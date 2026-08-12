@@ -16,3 +16,10 @@ select = ["E", "F", "I", "B"]
 ignore = [
     "B008"  # FastAPI dependency injection pattern
 ]
+[tool.coverage.run]
+branch = true
+source = ["core", "database", "models", "repositories", "routes", "schemas", "services"]
+
+[tool.coverage.report]
+fail_under = 85
+show_missing = true

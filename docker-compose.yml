@@ -1,7 +1,6 @@
 services:
   postgres:
     image: postgres:16
-    container_name: postgres_cnpj
 
     environment:
       POSTGRES_USER: ${DB_USER:-postgres}
@@ -9,7 +8,7 @@ services:
       POSTGRES_DB: ${DB_NAME:-cnpj_db}
 
     ports:
-      - "5433:5432"
+      - "${DB_HOST_PORT:-5434}:5432"
 
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -26,10 +25,9 @@ services:
 
   api:
     build: .
-    container_name: api_cnpj
 
     ports:
-      - "8000:8000"
+      - "${API_HOST_PORT:-8000}:8000"
 
     depends_on:
       postgres:
@@ -44,6 +42,8 @@ services:
       SECRET_KEY: "${SECRET_KEY:?Defina SECRET_KEY no arquivo .env}"
       ALGORITHM: ${ALGORITHM:-HS256}
       ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-60}
+      LOGIN_RATE_LIMIT_REQUESTS: ${LOGIN_RATE_LIMIT_REQUESTS:-5}
+      LOGIN_RATE_LIMIT_WINDOW_SECONDS: ${LOGIN_RATE_LIMIT_WINDOW_SECONDS:-60}
 
     command: >
       sh -c "
